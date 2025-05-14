@@ -6,6 +6,7 @@ import { useAssetStore } from '@/store/editables/asset/useAssetStore';
 import { Material, RenderedMaterial } from '@/types/editables/assetTypes';
 import { MarkdownSupported } from '../MarkdownSupported';
 import { CodeEditorLabelContent } from './CodeEditorLabelContent';
+import { RichTextEditor } from '@/components/common/RichTextEditor';
 import { CodeInput } from './CodeInput';
 import { TextInput } from './TextInput';
 import { useMaterialEditorContent } from './useMaterialEditorContent';
@@ -39,11 +40,51 @@ export const MaterialForm = ({ material }: MaterialFormProps) => {
     codeLanguage: 'markdown',
   };
 
-  const codeEditorSectionContent = showPreview ? codePreviewConfig : materialEditorContent;
+  const editorContent = showPreview ? codePreviewConfig : materialEditorContent;
+
+  const renderEditor = () => {
+    if (!editorContent) return null;
+
+    const commonProps = {
+      label: editorContent.label,
+      value: editorContent.value,
+      disabled: showPreview,
+    };
+
+    if (material.content_type === 'static_text') {
+      return (
+        <>
+          <div className=" items-center justify-between">
+            <label className="text">{editorContent.label}</label>
+            <CodeEditorLabelContent showPreview={showPreview} onClick={() => setShowPreview((prev) => !prev)} />
+          </div>
+          <RichTextEditor
+            {...commonProps}
+            onChange={(value) => editorContent.onChange?.(value || '')}
+            height={400}
+            className="w-full flex-grow"
+          />
+        </>
+      );
+    }
+
+    return (
+      <CodeInput
+        {...commonProps}
+        labelContent={
+          <CodeEditorLabelContent showPreview={showPreview} onClick={() => setShowPreview((prev) => !prev)} />
+        }
+        labelSize="md"
+        onChange={editorContent.onChange}
+        codeLanguage={editorContent.codeLanguage}
+        readOnly={showPreview}
+      />
+    );
+  };
 
   return (
     <>
-      <FormGroup className="relative">
+      <FormGroup className="relative w-full">
         <TextInput
           className="min-h-[90px]"
           label="Usage"
@@ -57,20 +98,8 @@ export const MaterialForm = ({ material }: MaterialFormProps) => {
         <MarkdownSupported />
       </FormGroup>
       <FormGroup className="w-full flex flex-col">
-        <div className="flex-1">
-          {codeEditorSectionContent ? (
-            <CodeInput
-              label={codeEditorSectionContent.label}
-              labelContent={
-                <CodeEditorLabelContent showPreview={showPreview} onClick={() => setShowPreview((prev) => !prev)} />
-              }
-              labelSize="md"
-              value={codeEditorSectionContent.value}
-              codeLanguage={codeEditorSectionContent.codeLanguage}
-              onChange={codeEditorSectionContent.onChange}
-              readOnly={showPreview}
-            />
-          ) : null}
+        <div className="w-full">
+          {renderEditor()}
           <MarkdownSupported />
         </div>
       </FormGroup>
