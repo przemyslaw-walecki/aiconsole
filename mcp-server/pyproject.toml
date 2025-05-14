@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "mcp-server"
+version = "0.1.0"
+description = "MCP Server for code execution"
+authors = ["Przemysław Walecki <p.walecki12@gmail.com>"]
+
+
+packages = [
+  { include = "src", from = "." },
+  { include = "tests", from = "." },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mcp = "1.8.1"
+fastapi = "0.109.0"
+uvicorn = "0.30.0"
+pydantic = ">=2.7.2,<3.0.0"
+python-dotenv = "1.1.0"
+aiohttp = "3.9.0"
+
+[tool.poetry.scripts]
+mcp-start = "src.mcp_client:main"
+test = "tests.test_mcp_run_code:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
